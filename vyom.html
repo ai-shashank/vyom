@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vyom Translator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      padding: 20px 40px;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border-bottom: 1px solid #2a2a4a;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #7c3aed, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tagline { font-size: 13px; color: #666; margin-top: 3px; }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      padding: 36px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .lang-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 14px;
+      padding: 16px 20px;
+      flex-wrap: wrap;
+    }
+
+    .lang-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .lang-group label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7c3aed;
+      font-weight: 600;
+    }
+
+    select {
+      background: #0f0f1a;
+      color: #e0e0e0;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+      transition: border 0.2s;
+      width: 100%;
+    }
+
+    select:focus { border-color: #7c3aed; }
+
+    .swap-btn {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 18px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.35s;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+
+    .swap-btn:hover { transform: rotate(180deg); }
+
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 680px) { .panels { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 11px 16px;
+      background: #16213e;
+      border-bottom: 1px solid #2a2a4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #666;
+    }
+
+    .panel-actions { display: flex; gap: 6px; align-items: center; }
+
+    .icon-btn {
+      background: none;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      color: #666;
+      padding: 4px 9px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover { border-color: #7c3aed; color: #a78bfa; }
+
+    .detect-btn {
+      background: none;
+      border: 1px solid #3b82f6;
+      color: #60a5fa;
+      border-radius: 7px;
+      padding: 4px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .detect-btn:hover { background: #3b82f620; }
+
+    textarea {
+      background: transparent;
+      border: none;
+      color: #e0e0e0;
+      font-size: 16px;
+      line-height: 1.75;
+      padding: 18px;
+      resize: none;
+      outline: none;
+      min-height: 210px;
+      font-family: inherit;
+      flex: 1;
+    }
+
+    textarea::placeholder { color: #3a3a5a; }
+
+    .output-box {
+      padding: 18px;
+      font-size: 16px;
+      line-height: 1.75;
+      color: #c4b5fd;
+      min-height: 210px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .placeholder-text { color: #2e2e4e; font-style: italic; }
+
+    .panel-footer {
+      padding: 8px 16px;
+      border-top: 1px solid #2a2a4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 34px;
+    }
+
+    .char-count { font-size: 12px; color: #444; }
+
+    .badge {
+      font-size: 11px;
+      background: #7c3aed18;
+      color: #a78bfa;
+      border: 1px solid #7c3aed44;
+      border-radius: 20px;
+      padding: 2px 10px;
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .translate-btn {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 40px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .translate-btn:hover { opacity: 0.87; transform: translateY(-1px); }
+    .translate-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status {
+      text-align: center;
+      font-size: 13px;
+      min-height: 18px;
+      color: #444;
+    }
+
+    .status.ok { color: #34d399; }
+    .status.err { color: #f87171; }
+    .status.info { color: #60a5fa; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🌐 Vyom Translator</div>
+  <div class="tagline">Instant language translation</div>
+</header>
+
+<div class="container">
+
+  <div class="lang-bar">
+    <div class="lang-group">
+      <label>From</label>
+      <select id="srcLang">
+        <option value="en">English</option>
+        <option value="es">Spanish</option>
+        <option value="fr">French</option>
+        <option value="hi">Hindi</option>
+        <option value="de">German</option>
+        <option value="zh">Chinese (Simplified)</option>
+        <option value="ar">Arabic</option>
+        <option value="pt">Portuguese</option>
+        <option value="ru">Russian</option>
+        <option value="ja">Japanese</option>
+        <option value="ko">Korean</option>
+        <option value="it">Italian</option>
+        <option value="tr">Turkish</option>
+        <option value="nl">Dutch</option>
+        <option value="pl">Polish</option>
+        <option value="sv">Swedish</option>
+        <option value="bn">Bengali</option>
+        <option value="ur">Urdu</option>
+        <option value="ta">Tamil</option>
+        <option value="te">Telugu</option>
+      </select>
+    </div>
+
+    <button class="swap-btn" onclick="swapLangs()" title="Swap">⇆</button>
+
+    <div class="lang-group">
+      <label>To</label>
+      <select id="tgtLang">
+        <option value="es">Spanish</option>
+        <option value="en">English</option>
+        <option value="fr">French</option>
+        <option value="hi">Hindi</option>
+        <option value="de">German</option>
+        <option value="zh">Chinese (Simplified)</option>
+        <option value="ar">Arabic</option>
+        <option value="pt">Portuguese</option>
+        <option value="ru">Russian</option>
+        <option value="ja">Japanese</option>
+        <option value="ko">Korean</option>
+        <option value="it">Italian</option>
+        <option value="tr">Turkish</option>
+        <option value="nl">Dutch</option>
+        <option value="pl">Polish</option>
+        <option value="sv">Swedish</option>
+        <option value="bn">Bengali</option>
+        <option value="ur">Urdu</option>
+        <option value="ta">Tamil</option>
+        <option value="te">Telugu</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="panels">
+    <!-- Input -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Input</span>
+        <div class="panel-actions">
+          <button class="detect-btn" onclick="detectLang()">🔍 Detect Language</button>
+          <button class="icon-btn" onclick="speakText('in')" title="Speak">🔊</button>
+          <button class="icon-btn" onclick="clearAll()" title="Clear">✕</button>
+        </div>
+      </div>
+      <textarea id="inputText" placeholder="Type or paste your text here..." maxlength="500" oninput="onInput()"></textarea>
+      <div class="panel-footer">
+        <span class="char-count"><span id="charCount">0</span>/500</span>
+        <span id="detectedBadge" class="badge" style="display:none"></span>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Translation</span>
+        <div class="panel-actions">
+          <button class="icon-btn" onclick="copyOut()" title="Copy">📋</button>
+          <button class="icon-btn" onclick="speakText('out')" title="Speak">🔊</button>
+        </div>
+      </div>
+      <div class="output-box" id="outputBox">
+        <span class="placeholder-text">Translation appears here...</span>
+      </div>
+      <div class="panel-footer">
+        <span class="char-count" id="outCount"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-row">
+    <button class="translate-btn" id="transBtn" onclick="doTranslate()">
+      <div class="spinner" id="spinner"></div>
+      <span id="btnLabel">▶ Translate</span>
+    </button>
+  </div>
+
+  <div class="status" id="status"></div>
+
+</div>
+
+<script>
+  // Language names map
+  const LANGS = {
+    en:"English", es:"Spanish", fr:"French", hi:"Hindi", de:"German",
+    zh:"Chinese", ar:"Arabic", pt:"Portuguese", ru:"Russian", ja:"Japanese",
+    ko:"Korean", it:"Italian", tr:"Turkish", nl:"Dutch", pl:"Polish",
+    sv:"Swedish", bn:"Bengali", ur:"Urdu", ta:"Tamil", te:"Telugu"
+  };
+
+  // Script-based heuristic detection (works offline, instant)
+  function detectByScript(text) {
+    const t = text.trim();
+    if (/[\u0900-\u097F]/.test(t)) {
+      // Devanagari — Hindi or Marathi; default Hindi
+      return "hi";
+    }
+    if (/[\u0600-\u06FF]/.test(t)) return "ar"; // Arabic / Urdu
+    if (/[\u4E00-\u9FFF]/.test(t)) return "zh"; // Chinese
+    if (/[\u3040-\u30FF]/.test(t)) return "ja"; // Japanese
+    if (/[\uAC00-\uD7AF]/.test(t)) return "ko"; // Korean
+    if (/[\u0400-\u04FF]/.test(t)) return "ru"; // Cyrillic
+    if (/[\u0980-\u09FF]/.test(t)) return "bn"; // Bengali
+    if (/[\u0C00-\u0C7F]/.test(t)) return "te"; // Telugu
+    if (/[\u0B80-\u0BFF]/.test(t)) return "ta"; // Tamil
+    // Latin-script languages — use word frequency hints
+    const lower = t.toLowerCase();
+    const esWords = ["el","la","los","las","de","en","que","es","un","una","con","por","para","como","pero","más","este","esta","son","tiene","hay","muy","todo","también","cuando","donde","porque","entre","sobre","hasta","desde","sin","nos","les","fue","ser","estar","hacer","tener","puede","bien","así","ya","si","no","sí"];
+    const frWords = ["le","la","les","de","du","des","un","une","et","en","que","qui","est","dans","il","elle","nous","vous","ils","elles","avec","pour","sur","par","pas","plus","tout","mais","ou","donc","car","ni","or","je","tu","ce","se","au","aux","son","sa","ses","leur","leurs","très","aussi","comme","quand","où","si","même","bien","encore","toujours","jamais","ici","là"];
+    const deWords = ["der","die","das","ein","eine","und","in","ist","von","mit","zu","den","dem","des","auf","für","an","im","nicht","auch","sich","es","er","sie","wir","ihr","haben","sein","werden","kann","muss","soll","wird","war","hat","sind","wurde","worden","aber","oder","wenn","als","wie","noch","schon","nur","so","dann","mehr","sehr","hier","dort","nach","vor","über","unter","zwischen","durch","gegen","ohne","um","bei","seit","bis","während","wegen"];
+    const itWords = ["il","lo","la","i","gli","le","un","una","di","da","in","con","su","per","tra","fra","e","ma","o","se","che","non","è","sono","ha","ho","hai","abbiamo","avete","hanno","essere","avere","fare","dire","andare","venire","vedere","sapere","potere","volere","dovere","molto","poco","bene","male","più","meno","anche","già","ancora","sempre","mai","qui","lì","come","quando","dove","perché","questo","quello","questi","quelli"];
+    const ptWords = ["o","a","os","as","um","uma","de","do","da","dos","das","em","no","na","nos","nas","por","para","com","que","se","não","é","são","foi","ser","ter","fazer","ir","ver","dar","vir","poder","querer","dever","muito","pouco","bem","mal","mais","menos","também","já","ainda","sempre","nunca","aqui","lá","como","quando","onde","porque","este","esse","aquele"];
+
+    function score(words, text) {
+      return words.filter(w => new RegExp("\\b" + w + "\\b", "i").test(text)).length;
+    }
+
+    const scores = {
+      es: score(esWords, lower),
+      fr: score(frWords, lower),
+      de: score(deWords, lower),
+      it: score(itWords, lower),
+      pt: score(ptWords, lower)
+    };
+
+    const best = Object.entries(scores).sort((a,b) => b[1]-a[1])[0];
+    if (best[1] >= 2) return best[0];
+    return "en"; // default
+  }
+
+  function setStatus(msg, type="") {
+    const el = document.getElementById("status");
+    el.textContent = msg;
+    el.className = "status " + type;
+  }
+
+  function setLoading(on) {
+    document.getElementById("spinner").style.display = on ? "block" : "none";
+    document.getElementById("btnLabel").textContent = on ? "Translating..." : "▶ Translate";
+    document.getElementById("transBtn").disabled = on;
+  }
+
+  function onInput() {
+    document.getElementById("charCount").textContent =
+      document.getElementById("inputText").value.length;
+  }
+
+  function detectLang() {
+    const text = document.getElementById("inputText").value.trim();
+    if (!text) { setStatus("Enter some text first.", "err"); return; }
+
+    const code = detectByScript(text);
+    const name = LANGS[code] || code;
+
+    // Update source selector
+    const sel = document.getElementById("srcLang");
+    if ([...sel.options].some(o => o.value === code)) sel.value = code;
+
+    // Show badge
+    const badge = document.getElementById("detectedBadge");
+    badge.textContent = "Detected: " + name;
+    badge.style.display = "inline";
+
+    setStatus("Language detected: " + name, "ok");
+  }
+
+  async function doTranslate() {
+    const text = document.getElementById("inputText").value.trim();
+    if (!text) { setStatus("Nothing to translate.", "err"); return; }
+
+    const src = document.getElementById("srcLang").value;
+    const tgt = document.getElementById("tgtLang").value;
+
+    if (src === tgt) { setStatus("Source and target are the same language.", "err"); return; }
+
+    setLoading(true);
+    setStatus("Translating...", "info");
+
+    // MyMemory API — correct format: src|tgt, max 500 bytes
+    const chunk = text.slice(0, 490); // stay under 500 byte limit
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${src}|${tgt}`;
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+
+      if (data.responseStatus === 200) {
+        const out = data.responseData.translatedText;
+        document.getElementById("outputBox").textContent = out;
+        document.getElementById("outCount").textContent = out.length + " chars";
+        setStatus("Done.", "ok");
+      } else {
+        // responseStatus 429 = quota exceeded
+        const msg = data.responseStatus === 429
+          ? "Daily quota exceeded. Try again tomorrow or use shorter text."
+          : (data.responseDetails || "Translation failed.");
+        setStatus(msg, "err");
+        document.getElementById("outputBox").innerHTML = '<span class="placeholder-text">Translation failed.</span>';
+      }
+    } catch(e) {
+      setStatus("Network error: " + e.message, "err");
+      document.getElementById("outputBox").innerHTML = '<span class="placeholder-text">Could not reach translation service.</span>';
+    }
+
+    setLoading(false);
+  }
+
+  function swapLangs() {
+    const src = document.getElementById("srcLang");
+    const tgt = document.getElementById("tgtLang");
+    const tmp = src.value;
+    src.value = tgt.value;
+    tgt.value = tmp;
+
+    // Also swap text if there's a translation
+    const outEl = document.getElementById("outputBox");
+    const inEl = document.getElementById("inputText");
+    if (!outEl.querySelector(".placeholder-text")) {
+      inEl.value = outEl.textContent;
+      outEl.innerHTML = '<span class="placeholder-text">Translation appears here...</span>';
+      onInput();
+    }
+  }
+
+  function clearAll() {
+    document.getElementById("inputText").value = "";
+    document.getElementById("outputBox").innerHTML = '<span class="placeholder-text">Translation appears here...</span>';
+    document.getElementById("charCount").textContent = "0";
+    document.getElementById("outCount").textContent = "";
+    document.getElementById("detectedBadge").style.display = "none";
+    setStatus("");
+  }
+
+  function copyOut() {
+    const el = document.getElementById("outputBox");
+    if (el.querySelector(".placeholder-text")) { setStatus("Nothing to copy.", "err"); return; }
+    navigator.clipboard.writeText(el.textContent)
+      .then(() => setStatus("Copied!", "ok"))
+      .catch(() => setStatus("Copy failed.", "err"));
+  }
+
+  function speakText(panel) {
+    if (!window.speechSynthesis) { setStatus("Speech not supported.", "err"); return; }
+    const text = panel === "in"
+      ? document.getElementById("inputText").value
+      : document.getElementById("outputBox").textContent;
+    if (!text.trim()) return;
+    const lang = panel === "in"
+      ? document.getElementById("srcLang").value
+      : document.getElementById("tgtLang").value;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  // Ctrl+Enter shortcut
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") doTranslate();
+  });
+</script>
+</body>
+</html>
